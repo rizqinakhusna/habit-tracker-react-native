@@ -7,8 +7,9 @@ A cross-platform habit tracking app built with [Expo](https://expo.dev), [React 
 - 📱 Universal app: Android, iOS, and Web
 - 🔒 Protected routes with authentication ([`useAuthContext`](lib/auth-context.ts))
 - 🗄️ Persistent storage ([`useStorage`](hooks/useStorage.ts))
-- 🎨 Tailwind CSS styling ([tailwind.config.js](tailwind.config.js))
-- 🎨 Supabase for BAAS ([Supbase](https://supabase.com/))
+- 🖌️ Component Library used [React Native Paper](https://reactnativepaper.com/)
+- 🎨 NativeWind with Tailwind CSS for styling ([tailwind.config.js](tailwind.config.js))
+- 📊 Supabase for BAAS ([Supbase](https://supabase.com/))
 - 🛠️ Prisma ORM for schema definition ([prisma/schema.prisma](prisma/schema.prisma))
 - 🚀 Fast development with Expo
 

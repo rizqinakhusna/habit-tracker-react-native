@@ -4,7 +4,7 @@ import { KeyboardAvoidingView, Platform, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const SigninScreen = () => {
+const SignupScreen = () => {
   const router = useRouter();
   return (
     <SafeAreaView className="h-screen">
@@ -14,7 +14,7 @@ const SigninScreen = () => {
       >
         <View className="my-auto px-5">
           <Text variant="headlineLarge" className=" mx-auto mb-10">
-            Sign In
+            Sign Up
           </Text>
           <View className=" gap-6">
             <TextInput
@@ -30,9 +30,9 @@ const SigninScreen = () => {
               placeholder="Enter password.."
               mode="outlined"
             />
-            <Button mode="contained">Sign In</Button>
+            <Button mode="contained">Sign Up</Button>
             <Button mode="text" onPress={() => router.replace("/sign-up")}>
-              Don't have an account? Sign Up
+              Already have an account? Sign in
             </Button>
           </View>
         </View>
@@ -41,4 +41,4 @@ const SigninScreen = () => {
   );
 };
 
-export default SigninScreen;
+export default SignupScreen;
