@@ -42,7 +42,8 @@
           }
         }
       ],
-      "@prisma/react-native"
+      "@prisma/react-native",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,
