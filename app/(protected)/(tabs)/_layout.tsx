@@ -3,7 +3,11 @@ import React from "react";
 
 const TabScreenLayout = () => {
   return (
-    <Tabs>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
       <Tabs.Screen name="index" options={{ title: "Home" }} />
     </Tabs>
   );
