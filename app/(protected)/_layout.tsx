@@ -2,11 +2,13 @@ import { useAuthContext } from "@/lib/auth-context";
 import { Redirect, Stack } from "expo-router";
 
 export default function ProtectedLayout() {
-  const { session } = useAuthContext();
+  const { session, isAuthStatesReady } = useAuthContext();
+  if (!isAuthStatesReady) return null;
+  if (!session?.user) {
+    return <Redirect href={"/sign-in"} />;
+  }
 
-  return !session ? (
-    <Redirect href={"/sign-in"} />
-  ) : (
+  return (
     <Stack>
       <Stack.Screen
         name="(tabs)"

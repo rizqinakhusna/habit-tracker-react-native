@@ -1,14 +1,25 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { type AuthError, type Session } from "@supabase/supabase-js";
-import { useRouter } from "expo-router";
-import { createContext, FC, ReactNode, useContext, useState } from "react";
+import { SplashScreen, useRouter } from "expo-router";
+import {
+  createContext,
+  FC,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { AuthSchemaType } from "./schema";
 import supabase from "./supabase";
+
+SplashScreen.preventAutoHideAsync();
 
 type AuthContextTypes = {
   session: Session | undefined;
   signIn: (params: AuthSchemaType) => Promise<{ err: AuthError | null }>;
   signUp: (params: AuthSchemaType) => Promise<{ err: AuthError | null }>;
   signOut: () => Promise<void>;
+  isAuthStatesReady: boolean;
 };
 
 const AuthContext = createContext<AuthContextTypes | null>(null);
@@ -17,7 +28,19 @@ const AuthContextProvider: FC<{
   children: ReactNode;
 }> = ({ children }) => {
   const [session, setSession] = useState<Session>();
+  const [isAuthStatesReady, setIsAuthStatesReady] = useState<boolean>(false);
   const router = useRouter();
+
+  const storeSessionToDeviceStorage = async (value: Session) => {
+    try {
+      await AsyncStorage.setItem("session", JSON.stringify(value));
+    } catch (error) {
+      console.log("session storage error", (error as Error).message);
+    }
+  };
+
+  const removeStoredSessionFromDeviceStorage = async () =>
+    await AsyncStorage.removeItem("session");
 
   const signIn = async ({ email, password }: AuthSchemaType) => {
     let err: AuthError | null = null;
@@ -32,6 +55,7 @@ const AuthContextProvider: FC<{
         throw new Error(error.message);
       }
       setSession(data.session);
+      storeSessionToDeviceStorage(data.session);
       router.replace("/");
     } catch (error) {
       console.error("sign in error:", error);
@@ -54,6 +78,7 @@ const AuthContextProvider: FC<{
       }
 
       setSession(data.session as Session);
+      storeSessionToDeviceStorage(data.session as Session);
       router.replace("/");
     } catch (error) {
       console.log("signup error:", error);
@@ -70,6 +95,7 @@ const AuthContextProvider: FC<{
     }
 
     setSession(undefined);
+    removeStoredSessionFromDeviceStorage();
     router.replace("/sign-in");
   };
 
@@ -78,7 +104,31 @@ const AuthContextProvider: FC<{
     signIn,
     signUp,
     signOut,
+    isAuthStatesReady,
   };
+
+  useEffect(() => {
+    const getSessionFromDeviceStorage = async () => {
+      try {
+        const storedSession = await AsyncStorage.getItem("session");
+        if (storedSession !== null) {
+          const parsedSession = JSON.parse(storedSession);
+          setSession(parsedSession);
+        }
+      } catch (error) {
+        console.log("Error fetching storage session: ", error);
+      }
+      setIsAuthStatesReady(true);
+    };
+
+    getSessionFromDeviceStorage();
+  }, []);
+
+  useEffect(() => {
+    if (isAuthStatesReady) {
+      SplashScreen.hideAsync();
+    }
+  }, [isAuthStatesReady]);
 
   return (
     <AuthContext.Provider value={contextData}>{children}</AuthContext.Provider>
