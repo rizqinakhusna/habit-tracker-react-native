@@ -22,6 +22,12 @@ export default function RootLayout() {
             animation: "none",
           }}
         />
+        <Stack.Screen
+          name="sign-up"
+          options={{
+            animation: "none",
+          }}
+        />
       </Stack>
     </AuthContextProvider>
   );
