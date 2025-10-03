@@ -8,6 +8,7 @@ type AuthContextTypes = {
   session: Session | undefined;
   signIn: (params: AuthSchemaType) => Promise<{ err: AuthError | null }>;
   signUp: (params: AuthSchemaType) => Promise<{ err: AuthError | null }>;
+  signOut: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextTypes | null>(null);
@@ -61,10 +62,22 @@ const AuthContextProvider: FC<{
     return { err };
   };
 
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.log("signout error: ", error.message);
+      return;
+    }
+
+    setSession(undefined);
+    router.replace("/sign-in");
+  };
+
   const contextData = {
     session,
     signIn,
     signUp,
+    signOut,
   };
 
   return (

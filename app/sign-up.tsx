@@ -22,7 +22,9 @@ const SignupScreen = () => {
     startTransition(async () => {
       const { err } = await signUp({ email, password });
       if (err) {
-        setError(err.message);
+        startTransition(() => {
+          setError(err.message);
+        });
       }
     });
   };
