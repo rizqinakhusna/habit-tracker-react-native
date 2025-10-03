@@ -1,6 +1,6 @@
 import { useAuthContext } from "@/lib/auth-context";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { KeyboardAvoidingView, Platform, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -9,18 +9,31 @@ const SigninScreen = () => {
   const router = useRouter();
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
-  const [error, setError] = useState<boolean>();
-
+  const [error, setError] = useState<string>();
+  const [isPending, startTransition] = useTransition();
   const { signIn } = useAuthContext();
 
-  const handleSignIn = async () => {
+  const handleSignIn = () => {
     if (!email || !password) {
-      setError(true);
+      setError("*Please fill the input fields");
       return;
     }
 
-    // const { res, error } = signIn();
+    startTransition(async () => {
+      const { err } = await signIn({ email, password });
+      if (err) {
+        startTransition(() => {
+          setError(err?.message ?? "Something went wrong!");
+        });
+      }
+    });
   };
+
+  useEffect(() => {
+    if ((error as string)?.length) {
+      setError(undefined);
+    }
+  }, [email, password]);
 
   return (
     <SafeAreaView className="h-screen">
@@ -48,13 +61,9 @@ const SigninScreen = () => {
               mode="outlined"
               onChangeText={setPassword}
             />
-            {error && (
-              <Text className=" !text-red-500">
-                *Please fill the input fields
-              </Text>
-            )}
+            {error && <Text className=" !text-red-500">{error}</Text>}
 
-            <Button mode="contained" onPress={handleSignIn}>
+            <Button mode="contained" onPress={handleSignIn} loading={isPending}>
               Sign In
             </Button>
             <Button mode="text" onPress={() => router.replace("/sign-up")}>

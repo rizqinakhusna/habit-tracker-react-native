@@ -1,24 +1,13 @@
-import {
-  createContext,
-  Dispatch,
-  FC,
-  ReactNode,
-  SetStateAction,
-  useContext,
-  useState,
-} from "react";
-import { Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { type AuthError, type Session } from "@supabase/supabase-js";
+import { useRouter } from "expo-router";
+import { createContext, FC, ReactNode, useContext, useState } from "react";
+import { AuthSchemaType } from "./schema";
+import supabase from "./supabase";
 
 type AuthContextTypes = {
-  user: boolean;
-  setUser: Dispatch<SetStateAction<boolean>>;
-  session: boolean;
-  setSession: Dispatch<SetStateAction<boolean>>;
-  loading: boolean;
-  setLoading: Dispatch<SetStateAction<boolean>>;
-  signIn: () => Promise<void>;
-  signOut: () => Promise<void>;
+  session: Session | undefined;
+  signIn: (params: AuthSchemaType) => Promise<{ err: AuthError | null }>;
+  signUp: (params: AuthSchemaType) => Promise<{ err: AuthError | null }>;
 };
 
 const AuthContext = createContext<AuthContextTypes | null>(null);
@@ -26,34 +15,60 @@ const AuthContext = createContext<AuthContextTypes | null>(null);
 const AuthContextProvider: FC<{
   children: ReactNode;
 }> = ({ children }) => {
-  const [user, setUser] = useState(false);
-  const [session, setSession] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [session, setSession] = useState<Session>();
+  const router = useRouter();
 
-  const signIn = async () => {};
-  const signOut = async () => {};
+  const signIn = async ({ email, password }: AuthSchemaType) => {
+    let err: AuthError | null = null;
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        err = error;
+        throw new Error(error.message);
+      }
+      setSession(data.session);
+      router.replace("/");
+    } catch (error) {
+      console.error("sign in error:", error);
+    }
+
+    return { err };
+  };
+
+  const signUp = async ({ email, password }: AuthSchemaType) => {
+    let err: AuthError | null = null;
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        err = error;
+        throw new Error(error.message);
+      }
+
+      setSession(data.session as Session);
+      router.replace("/");
+    } catch (error) {
+      console.log("signup error:", error);
+    }
+
+    return { err };
+  };
 
   const contextData = {
-    user,
     session,
     signIn,
-    signOut,
-    setUser,
-    setSession,
-    setLoading,
-    loading,
+    signUp,
   };
 
   return (
-    <AuthContext.Provider value={contextData}>
-      {loading ? (
-        <SafeAreaView>
-          <Text>Loadinggggggg...</Text>
-        </SafeAreaView>
-      ) : (
-        children
-      )}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextData}>{children}</AuthContext.Provider>
   );
 };
 
