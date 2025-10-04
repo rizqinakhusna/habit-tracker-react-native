@@ -6,3 +6,14 @@ export const authSchema = z.object({
 });
 
 export type AuthSchemaType = z.infer<typeof authSchema>;
+
+export type Habit = {
+  id: number;
+  title: string;
+  description: string;
+  frequency: string;
+  created_at: string;
+  last_completed: string;
+  streaks_count: number;
+  user_id: string;
+};

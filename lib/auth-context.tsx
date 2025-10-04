@@ -9,8 +9,8 @@ import {
   useEffect,
   useState,
 } from "react";
-import { AuthSchemaType } from "./schema";
 import supabase from "./supabase";
+import { AuthSchemaType } from "./types";
 
 SplashScreen.preventAutoHideAsync();
 
