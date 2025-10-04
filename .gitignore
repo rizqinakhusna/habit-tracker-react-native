@@ -43,4 +43,4 @@ app-example
 /ios
 /android
 
-/app/generated/prisma
+/prisma/generated/prisma
