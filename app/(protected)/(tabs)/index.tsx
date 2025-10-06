@@ -3,13 +3,19 @@ import supabase from "@/lib/supabase";
 import { Habit } from "@/lib/types";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { PostgrestError } from "@supabase/supabase-js";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ScrollView, View } from "react-native";
+import ReanimatedSwipeable, {
+  SwipeableMethods,
+} from "react-native-gesture-handler/ReanimatedSwipeable";
 import { Badge, Button, Card, Text } from "react-native-paper";
 
 const HomeScreen = () => {
   const { signOut, session } = useAuthContext();
   const [habits, setHabits] = useState<Habit[]>();
+  const swipeableRefs = useRef<{
+    [key: string]: SwipeableMethods | null;
+  }>({});
 
   async function getHabitsFromDatabase() {
     try {
@@ -23,6 +29,22 @@ const HomeScreen = () => {
       setHabits(data);
     } catch (error) {
       console.log("habits fetch error: ", error as PostgrestError);
+    }
+  }
+
+  async function onCompleteHabit(habitId: number) {}
+
+  async function onDeleteHabit(habitId: number) {
+    try {
+      const { error } = await supabase
+        .from("Habits")
+        .delete()
+        .eq("id", habitId);
+      if (error) {
+        throw new Error(error.message);
+      }
+    } catch (error) {
+      console.error("habit deletion error: ", error);
     }
   }
 
@@ -46,25 +68,44 @@ const HomeScreen = () => {
           <Text>No habit added yet!</Text>
         ) : (
           habits?.map((habit) => (
-            <Card key={habit.id} mode="contained">
-              <Card.Title title={habit.title} />
-              <Card.Content>
-                <Text>{habit.description}</Text>
-                <View className="flex-row justify-between mt-4">
-                  <View className="flex-row items-center gap-2 bg-yellow-100 rounded-full px-2 py-1">
-                    <MaterialCommunityIcons
-                      name="fire"
-                      size={16}
-                      color={"#ca8a04"}
-                    />
-                    <Text style={{ color: "#ca8a04" }}>
-                      {habit.streaks_count} days streak
-                    </Text>
+            <ReanimatedSwipeable
+              key={habit.id}
+              ref={(ref: SwipeableMethods) => {
+                swipeableRefs.current[habit.id] = ref;
+              }}
+              overshootLeft={false}
+              overshootRight={false}
+              renderLeftActions={LeftAction}
+              renderRightActions={RightAction}
+              onSwipeableOpen={(direction) => {
+                direction === "right" && onCompleteHabit(habit.id);
+                direction === "left" && onDeleteHabit(habit.id);
+
+                swipeableRefs.current[habit.id]?.close();
+              }}
+            >
+              <Card mode="outlined">
+                <Card.Title title={habit.title} />
+                <Card.Content>
+                  <Text>{habit.description}</Text>
+                  <View className="flex-row justify-between mt-4">
+                    <View className="flex-row items-center gap-2 bg-yellow-100 rounded-full px-2 py-1">
+                      <MaterialCommunityIcons
+                        name="fire"
+                        size={16}
+                        color={"#ca8a04"}
+                      />
+                      <Text style={{ color: "#ca8a04" }}>
+                        {habit.streaks_count} days streak
+                      </Text>
+                    </View>
+                    <Badge className={"capitalize px-4"}>
+                      {habit.frequency}
+                    </Badge>
                   </View>
-                  <Badge className={"capitalize px-4"}>{habit.frequency}</Badge>
-                </View>
-              </Card.Content>
-            </Card>
+                </Card.Content>
+              </Card>
+            </ReanimatedSwipeable>
           ))
         )}
 
@@ -77,3 +118,27 @@ const HomeScreen = () => {
 };
 
 export default HomeScreen;
+
+function LeftAction() {
+  return (
+    <View className="flex-1 bg-green-500 rounded-xl justify-center pl-6">
+      <MaterialCommunityIcons
+        name="check-circle-outline"
+        size={32}
+        color={"#FFF"}
+      />
+    </View>
+  );
+}
+
+function RightAction() {
+  return (
+    <View className="flex-1 bg-red-600 rounded-xl items-end pr-6 justify-center">
+      <MaterialCommunityIcons
+        name="trash-can-outline"
+        size={32}
+        color={"#FFF"}
+      />
+    </View>
+  );
+}
