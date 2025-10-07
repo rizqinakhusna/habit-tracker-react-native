@@ -32,7 +32,42 @@ const HomeScreen = () => {
     }
   }
 
-  async function onCompleteHabit(habitId: number) {}
+  async function onCompleteHabit(habitId: number) {
+    try {
+      const { data, error } = await supabase
+        .from("HabitCompletions")
+        .insert({
+          habit_id: habitId,
+          user_id: session?.user.id,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      console.log("completion", data);
+
+      const habit = habits?.find((h) => h.id === habitId);
+
+      if (!habit || !data) return;
+
+      const { data: updatedHabit, error: updateHabitError } = await supabase
+        .from("Habits")
+        .update({
+          streaks_count: habit.streaks_count + 1,
+          last_completed: data.completed_at,
+        })
+        .eq("id", habitId);
+
+      if (updateHabitError) {
+        throw new Error(updateHabitError.message);
+      }
+    } catch (error) {
+      console.log("habit completion error: ", error);
+    }
+  }
 
   async function onDeleteHabit(habitId: number) {
     try {

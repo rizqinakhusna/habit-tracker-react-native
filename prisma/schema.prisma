@@ -29,7 +29,7 @@ model Habits {
 model HabitCompletions {
   id           Int      @id @default(autoincrement())
   habit_id     Int
-  habit        Habits   @relation(fields: [habit_id], references: [id])
+  // habit        Habits   @relation(fields: [habit_id], references: [id])
   user_id      String
   completed_at DateTime @default(now())
 }
