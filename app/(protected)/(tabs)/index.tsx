@@ -110,7 +110,7 @@ const HomeScreen = () => {
   }
 
   useEffect(() => {
-    supabase
+    const habitChannel = supabase
       .channel("habits_channel")
       .on(
         "postgres_changes",
@@ -121,7 +121,7 @@ const HomeScreen = () => {
       )
       .subscribe();
 
-    supabase
+    const completionChannel = supabase
       .channel("completion_channel")
       .on(
         "postgres_changes",
@@ -133,6 +133,11 @@ const HomeScreen = () => {
       .subscribe();
     getTodayCompletions();
     getHabitsFromDatabase();
+
+    return () => {
+      habitChannel.unsubscribe();
+      completionChannel.unsubscribe();
+    };
   }, [session]);
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
