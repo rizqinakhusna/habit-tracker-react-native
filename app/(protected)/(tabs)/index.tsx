@@ -147,6 +147,14 @@ const HomeScreen = () => {
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View className="p-4 flex-1 gap-6">
+        <Button
+          icon={"logout"}
+          mode="text"
+          onPress={signOut}
+          className=" flex-row-reverse"
+        >
+          Signout
+        </Button>
         {habits?.length === 0 ? (
           <Text>No habit added yet!</Text>
         ) : (
@@ -193,10 +201,6 @@ const HomeScreen = () => {
             </ReanimatedSwipeable>
           ))
         )}
-
-        <Button mode="outlined" onPress={signOut} className=" mt-auto">
-          Signout
-        </Button>
       </View>
     </ScrollView>
   );
