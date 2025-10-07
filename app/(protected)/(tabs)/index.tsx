@@ -8,16 +8,19 @@ import { ScrollView, ToastAndroid, View } from "react-native";
 import ReanimatedSwipeable, {
   SwipeableMethods,
 } from "react-native-gesture-handler/ReanimatedSwipeable";
-import { Badge, Button, Card, Text } from "react-native-paper";
+import { Badge, Button, Card, Text, useTheme } from "react-native-paper";
 
 const HomeScreen = () => {
   const { signOut, session } = useAuthContext();
   const [habits, setHabits] = useState<Habit[]>();
-  const [completionHabits, setCompletionHabits] = useState<any>();
+  const [completionHabits, setCompletionHabits] = useState<number[]>();
+  const theme = useTheme();
 
   const swipeableRefs = useRef<{
     [key: string]: SwipeableMethods | null;
   }>({});
+
+  const isCompleted = (habitId: number) => completionHabits?.includes(habitId);
 
   async function getTodayCompletions() {
     try {
@@ -57,10 +60,11 @@ const HomeScreen = () => {
   }
 
   async function onCompleteHabit(habitId: number) {
-    if (completionHabits.includes(habitId)) {
+    if (isCompleted(habitId)) {
       ToastAndroid.show("Habit Already Completed!", ToastAndroid.SHORT);
       return;
     }
+
     try {
       const { data, error } = await supabase
         .from("HabitCompletions")
@@ -139,6 +143,7 @@ const HomeScreen = () => {
       completionChannel.unsubscribe();
     };
   }, [session]);
+
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View className="p-4 flex-1 gap-6">
@@ -153,7 +158,9 @@ const HomeScreen = () => {
               }}
               overshootLeft={false}
               overshootRight={false}
-              renderLeftActions={LeftAction}
+              renderLeftActions={() =>
+                LeftAction(isCompleted(habit.id as number) as boolean)
+              }
               renderRightActions={RightAction}
               onSwipeableOpen={(direction) => {
                 direction === "right" && onCompleteHabit(habit.id);
@@ -197,14 +204,18 @@ const HomeScreen = () => {
 
 export default HomeScreen;
 
-function LeftAction() {
+function LeftAction(isCompleted: boolean) {
   return (
     <View className="flex-1 bg-green-500 rounded-xl justify-center pl-6">
-      <MaterialCommunityIcons
-        name="check-circle-outline"
-        size={32}
-        color={"#FFF"}
-      />
+      {isCompleted ? (
+        <Text>Habit already completed!</Text>
+      ) : (
+        <MaterialCommunityIcons
+          name="check-circle-outline"
+          size={32}
+          color={"#FFF"}
+        />
+      )}
     </View>
   );
 }
