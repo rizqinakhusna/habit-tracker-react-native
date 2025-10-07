@@ -4,7 +4,7 @@ import { Habit } from "@/lib/types";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { PostgrestError } from "@supabase/supabase-js";
 import React, { useEffect, useRef, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { ScrollView, ToastAndroid, View } from "react-native";
 import ReanimatedSwipeable, {
   SwipeableMethods,
 } from "react-native-gesture-handler/ReanimatedSwipeable";
@@ -13,9 +13,33 @@ import { Badge, Button, Card, Text } from "react-native-paper";
 const HomeScreen = () => {
   const { signOut, session } = useAuthContext();
   const [habits, setHabits] = useState<Habit[]>();
+  const [completionHabits, setCompletionHabits] = useState<any>();
+
   const swipeableRefs = useRef<{
     [key: string]: SwipeableMethods | null;
   }>({});
+
+  async function getTodayCompletions() {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const { data, error } = await supabase
+        .from("HabitCompletions")
+        .select("*")
+        .eq("user_id", session?.user.id)
+        .gte("completed_at", today.toISOString());
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      const ids = data.map((item) => item.habit_id);
+
+      setCompletionHabits(ids);
+    } catch (error) {
+      console.error("completion habit fetch error: ", error);
+    }
+  }
 
   async function getHabitsFromDatabase() {
     try {
@@ -33,6 +57,10 @@ const HomeScreen = () => {
   }
 
   async function onCompleteHabit(habitId: number) {
+    if (completionHabits.includes(habitId)) {
+      ToastAndroid.show("Habit Already Completed!", ToastAndroid.SHORT);
+      return;
+    }
     try {
       const { data, error } = await supabase
         .from("HabitCompletions")
@@ -46,8 +74,6 @@ const HomeScreen = () => {
       if (error) {
         throw new Error(error.message);
       }
-
-      console.log("completion", data);
 
       const habit = habits?.find((h) => h.id === habitId);
 
@@ -94,6 +120,18 @@ const HomeScreen = () => {
         }
       )
       .subscribe();
+
+    supabase
+      .channel("completion_channel")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "HabitCompletions" },
+        (payload) => {
+          getTodayCompletions();
+        }
+      )
+      .subscribe();
+    getTodayCompletions();
     getHabitsFromDatabase();
   }, [session]);
   return (
