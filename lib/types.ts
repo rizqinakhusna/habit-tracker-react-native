@@ -17,3 +17,10 @@ export type Habit = {
   streaks_count: number;
   user_id: string;
 };
+
+export type HabitCompletion = {
+  id: number;
+  habit_id: number;
+  user_id: string;
+  completed_at: string;
+};
