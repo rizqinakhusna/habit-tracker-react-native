@@ -4,8 +4,8 @@ import { Habit } from "@/lib/types";
 import { HabitCompletions } from "@/prisma/generated/prisma";
 import { PostgrestError } from "@supabase/supabase-js";
 import React, { useEffect, useState } from "react";
-import { ScrollView } from "react-native";
-import { Text } from "react-native-paper";
+import { ScrollView, View } from "react-native";
+import { Card, Text } from "react-native-paper";
 
 type StreakData = {
   streak: number;
@@ -105,8 +105,40 @@ const StreaksScreen = () => {
   }, [session]);
 
   return (
-    <ScrollView className="p-6">
-      <Text variant="titleMedium">Habit Streaks</Text>
+    <ScrollView className="p-6 flex-1 ">
+      {habits?.length === 0 ? (
+        <View className="flex-1 justify-center bg-red-500 h-full">
+          <Text>No Habit Streaks</Text>
+        </View>
+      ) : (
+        <View className="flex-1 gap-6 mt-6">
+          {rankedHabit?.map((rh, index) => (
+            <Card
+              key={rh.habit.id}
+              mode={index === 0 ? "outlined" : "elevated"}
+            >
+              <Card.Title title={rh.habit.title} />
+              <Card.Content>
+                <Text>{rh.habit.description}</Text>
+                <View className="flex-row items-center gap-3 mt-6">
+                  <View className="flex-row">
+                    <Text> 🔥 {rh.streak}</Text>
+                    <Text> Current</Text>
+                  </View>
+                  <View className="flex-row gap-1">
+                    <Text> 🏆 {rh.bestStreak}</Text>
+                    <Text> Best</Text>
+                  </View>
+                  <View className="flex-row gap-1">
+                    <Text> ✅ {rh.total}</Text>
+                    <Text> Total </Text>
+                  </View>
+                </View>
+              </Card.Content>
+            </Card>
+          ))}
+        </View>
+      )}
     </ScrollView>
   );
 };
