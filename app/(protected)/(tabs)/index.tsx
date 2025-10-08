@@ -8,13 +8,12 @@ import { ScrollView, ToastAndroid, View } from "react-native";
 import ReanimatedSwipeable, {
   SwipeableMethods,
 } from "react-native-gesture-handler/ReanimatedSwipeable";
-import { Badge, Button, Card, Text, useTheme } from "react-native-paper";
+import { Badge, Button, Card, Text } from "react-native-paper";
 
 const HomeScreen = () => {
   const { signOut, session } = useAuthContext();
   const [habits, setHabits] = useState<Habit[]>();
   const [completionHabits, setCompletionHabits] = useState<number[]>();
-  const theme = useTheme();
 
   const swipeableRefs = useRef<{
     [key: string]: SwipeableMethods | null;
