@@ -4,7 +4,7 @@ import { Habit } from "@/lib/types";
 import { HabitCompletions } from "@/prisma/generated/prisma";
 import { PostgrestError } from "@supabase/supabase-js";
 import React, { useEffect, useState } from "react";
-import { ScrollView, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { Card, Text } from "react-native-paper";
 
 type StreakData = {
@@ -99,6 +99,8 @@ const StreaksScreen = () => {
 
   const rankedHabit = habitStreaks?.sort((a, b) => a.bestStreak - b.bestStreak);
 
+  const badgeStyle = [styles.badge1, styles.badge2, styles.badge3];
+
   useEffect(() => {
     getCompletions();
     getHabitsFromDatabase();
@@ -106,6 +108,39 @@ const StreaksScreen = () => {
 
   return (
     <ScrollView className="p-6 flex-1 ">
+      {rankedHabit?.length && (
+        <View className="  bg-white rounded-xl shadow p-4 ">
+          <Text variant="headlineMedium" className="mb-4">
+            🏅 Top Streaks
+          </Text>
+          <View className=" divide-y divide-slate-400 flex-1 gap-2">
+            {rankedHabit.slice(0, 3).map((item, index) => (
+              <View
+                key={item.habit.id}
+                className="flex-row justify-between items-center"
+              >
+                <View className=" flex-row items-center shrink-0 gap-2">
+                  <View
+                    style={badgeStyle[index]}
+                    className=" items-center justify-center mx-auto size-7 rounded-full"
+                  >
+                    <Text
+                      style={{
+                        color: "white",
+                        fontSize: 15,
+                      }}
+                    >
+                      {index + 1}
+                    </Text>
+                  </View>
+                  <Text>{item.habit.title}</Text>
+                </View>
+                <Text>{item.bestStreak}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
       {habits?.length === 0 ? (
         <View className="flex-1 justify-center bg-red-500 h-full">
           <Text>No Habit Streaks</Text>
@@ -142,5 +177,11 @@ const StreaksScreen = () => {
     </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  badge1: { backgroundColor: "#ffd700" },
+  badge2: { backgroundColor: "#c0c0c0" },
+  badge3: { backgroundColor: "#cd7f32" },
+});
 
 export default StreaksScreen;
