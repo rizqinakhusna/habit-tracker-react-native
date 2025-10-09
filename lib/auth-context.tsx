@@ -9,6 +9,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { Platform } from "react-native";
 import supabase from "./supabase";
 import { AuthSchemaType } from "./types";
 
@@ -32,15 +33,24 @@ const AuthContextProvider: FC<{
   const router = useRouter();
 
   const storeSessionToDeviceStorage = async (value: Session) => {
-    try {
-      await AsyncStorage.setItem("session", JSON.stringify(value));
-    } catch (error) {
-      console.log("session storage error", (error as Error).message);
+    if (Platform.OS === "web") {
+      localStorage.setItem("session", JSON.stringify(value));
+    } else {
+      try {
+        await AsyncStorage.setItem("session", JSON.stringify(value));
+      } catch (error) {
+        console.log("session storage error", (error as Error).message);
+      }
     }
   };
 
-  const removeStoredSessionFromDeviceStorage = async () =>
-    await AsyncStorage.removeItem("session");
+  const removeStoredSessionFromDeviceStorage = async () => {
+    if (Platform.OS === "web") {
+      localStorage.removeItem("session");
+    } else {
+      await AsyncStorage.removeItem("session");
+    }
+  };
 
   const signIn = async ({ email, password }: AuthSchemaType) => {
     let err: AuthError | null = null;
@@ -110,7 +120,10 @@ const AuthContextProvider: FC<{
   useEffect(() => {
     const getSessionFromDeviceStorage = async () => {
       try {
-        const storedSession = await AsyncStorage.getItem("session");
+        const storedSession =
+          Platform.OS === "web"
+            ? localStorage.getItem("session")
+            : await AsyncStorage.getItem("session");
         if (storedSession !== null) {
           const parsedSession = JSON.parse(storedSession);
           setSession(parsedSession);

@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient, processLock } from "@supabase/supabase-js";
+import { Platform } from "react-native";
 import "react-native-url-polyfill/auto";
 
 const supabase = createClient(
@@ -9,7 +10,7 @@ const supabase = createClient(
     auth: {
       storage: AsyncStorage,
       autoRefreshToken: true,
-      persistSession: true,
+      persistSession: Platform.OS === "web" ? false : true,
       detectSessionInUrl: false,
       lock: processLock,
     },
